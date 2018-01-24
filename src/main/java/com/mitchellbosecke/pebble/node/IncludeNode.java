@@ -16,7 +16,6 @@ import java.util.Map;
 import com.mitchellbosecke.pebble.error.PebbleException;
 import com.mitchellbosecke.pebble.extension.NodeVisitor;
 import com.mitchellbosecke.pebble.node.expression.Expression;
-import com.mitchellbosecke.pebble.node.expression.MapExpression;
 import com.mitchellbosecke.pebble.template.EvaluationContext;
 import com.mitchellbosecke.pebble.template.PebbleTemplateImpl;
 
@@ -24,9 +23,9 @@ public class IncludeNode extends AbstractRenderableNode {
 
     private final Expression<?> includeExpression;
 
-    private final MapExpression mapExpression;
+    private final Expression<?> mapExpression;
 
-    public IncludeNode(int lineNumber, Expression<?> includeExpression, MapExpression mapExpression) {
+    public IncludeNode(int lineNumber, Expression<?> includeExpression, Expression<?> mapExpression) {
         super(lineNumber);
         this.includeExpression = includeExpression;
         this.mapExpression = mapExpression;
@@ -39,7 +38,13 @@ public class IncludeNode extends AbstractRenderableNode {
 
         Map<?, ?> map = Collections.emptyMap();
         if (this.mapExpression != null) {
-            map = this.mapExpression.evaluate(self, context);
+            Object mapExpressionResult = this.mapExpression.evaluate(self, context);
+            if (mapExpressionResult instanceof Map) {
+                map = (Map<?, ?>) mapExpressionResult;
+            } else {
+                throw new PebbleException(null, String.format("Expression %1s could not be evaluated to a map",
+                    this.mapExpression.getClass().getCanonicalName()), getLineNumber(), self.getName());
+            }
         }
 
         if (templateName == null) {

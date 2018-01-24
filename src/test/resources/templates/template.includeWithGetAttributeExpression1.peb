@@ -1,0 +1,2 @@
+{# used by IncludeWithParameterTest.testIncludeWithGetAttributeExpression #}
+{% include './template.includeWithGetAttributeExpression2.peb' with data.subContext %}

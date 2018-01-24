@@ -1,0 +1,2 @@
+{# used by IncludeWithParameterTest.testIncludeWithGetContextExpression #}
+{% include './template.includeWithContextExpression2.peb' with data %}

@@ -14,7 +14,6 @@ import com.mitchellbosecke.pebble.lexer.TokenStream;
 import com.mitchellbosecke.pebble.node.IncludeNode;
 import com.mitchellbosecke.pebble.node.RenderableNode;
 import com.mitchellbosecke.pebble.node.expression.Expression;
-import com.mitchellbosecke.pebble.node.expression.MapExpression;
 import com.mitchellbosecke.pebble.parser.Parser;
 
 public class IncludeTokenParser extends AbstractTokenParser {
@@ -31,7 +30,7 @@ public class IncludeTokenParser extends AbstractTokenParser {
         Expression<?> includeExpression = parser.getExpressionParser().parseExpression();
 
         Token current = stream.current();
-        MapExpression mapExpression = null;
+        Expression<?> mapExpression = null;
 
         // We check if there is an optional 'with' parameter on the include tag.
         if (current.getType().equals(Token.Type.NAME) && current.getValue().equals("with")) {
@@ -39,15 +38,7 @@ public class IncludeTokenParser extends AbstractTokenParser {
             // Skip over 'with'
             stream.next();
 
-            Expression<?> parsedExpression = parser.getExpressionParser().parseExpression();
-
-            if (parsedExpression instanceof MapExpression) {
-                mapExpression = (MapExpression) parsedExpression;
-            } else {
-                throw new ParserException(null, String.format("Unexpected expression '%1s'.", parsedExpression
-                        .getClass().getCanonicalName()), token.getLineNumber(), stream.getFilename());
-            }
-
+            mapExpression = parser.getExpressionParser().parseExpression();
         }
 
         stream.expect(Token.Type.EXECUTE_END);

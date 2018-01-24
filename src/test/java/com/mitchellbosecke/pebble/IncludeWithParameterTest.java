@@ -7,6 +7,7 @@ import org.junit.Test;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -57,4 +58,57 @@ public class IncludeWithParameterTest extends AbstractTest {
 
     }
 
+    @Test
+    public void testIncludeWithGetAttributeExpression() throws PebbleException, IOException {
+
+        PebbleEngine pebble = new PebbleEngine.Builder().strictVariables(false).build();
+        PebbleTemplate template = pebble.getTemplate("templates/template.includeWithGetAttributeExpression1.peb");
+        Map<String, Object> context = new HashMap<>();
+        Map<String, Object> data = new HashMap<>();
+        Map<String, String> subContext = new HashMap<>();
+        subContext.put("label", "foo");
+        data.put("subContext", subContext);
+        context.put("data", data);
+
+        Writer writer = new StringWriter();
+        template.evaluate(writer, context);
+
+        String expectedOutput = "foo";
+
+        assertEquals(expectedOutput, writer.toString());
+    }
+
+    @Test(expected = PebbleException.class)
+    public void testWithFailedGetAttributeExpression() throws PebbleException, IOException {
+
+        PebbleEngine pebble = new PebbleEngine.Builder().strictVariables(false).build();
+        PebbleTemplate template = pebble.getTemplate("templates/template.includeWithGetAttributeExpression1.peb");
+        Map<String, Object> context = new HashMap<>();
+        context.put("data", Arrays.asList("foo", "bar"));
+
+        Writer writer = new StringWriter();
+        template.evaluate(writer, context);
+
+        String expectedOutput = "foo";
+
+        assertEquals(expectedOutput, writer.toString());
+    }
+    
+    @Test
+    public void testIncludeWithContextExpression() throws PebbleException, IOException {
+
+        PebbleEngine pebble = new PebbleEngine.Builder().strictVariables(false).build();
+        PebbleTemplate template = pebble.getTemplate("templates/template.includeWithContextExpression1.peb");
+        Map<String, Object> context = new HashMap<>();
+        Map<String, String> data = new HashMap<>();
+        data.put("label", "foo");
+        context.put("data", data);
+
+        Writer writer = new StringWriter();
+        template.evaluate(writer, context);
+
+        String expectedOutput = "foo";
+
+        assertEquals(expectedOutput, writer.toString());
+    }
 }
